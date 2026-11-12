@@ -90,3 +90,24 @@ can get back into the zone.
 - The exact expected turns with no choice (100.8) matches the simulated mean above (100.6).
 - 10,000 simulated games with the optimal strategy gave a mean of 37.4 (median 26)
   against a predicted 37.7.
+
+## Variant: choose direction too
+
+As well as (or instead of) swapping the dice, you may reverse the direction of either
+axis, e.g. move left instead of right, or down instead of up. Moves still wrap.
+
+Expected turns under optimal play, for each combination of choices:
+
+| Choices allowed | Without swapping dice | With swapping dice |
+|---|---|---|
+| No direction choice | 100.8 | 37.7 |
+| Reverse horizontal | 45.6 | 18.7 |
+| Reverse vertical | 43.9 | 17.7 |
+| Reverse both | 21.7 | 10.8 |
+
+With only forward moves, each die reaches 6 of the 10 positions along its axis.
+Allowing reverse moves reaches all 9 other positions, so with both axes reversible you
+can hit 100 in one throw from any square not in its row or column, given the right roll.
+
+Check: 10,000 simulated games with every choice allowed gave a mean of 10.80 turns
+(median 8) against a predicted 10.82.

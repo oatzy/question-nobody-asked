@@ -43,12 +43,22 @@ def make_policy(pick):
     return {(s, a, b): pick(s, a, b) for s in STATES for a, b in ROLLS}
 
 
-def optimal():
+def choices(a, b, swap=True, flip_x=False, flip_y=False):
+    """Moves allowed for a roll: optionally swap the dice, and/or reverse either axis."""
+    orders = [(a, b), (b, a)] if swap else [(a, b)]
+    xs = (1, -1) if flip_x else (1,)
+    ys = (1, -1) if flip_y else (1,)
+    return [(sx * dx, sy * dy) for dx, dy in orders for sx in xs for sy in ys]
+
+
+def optimal(**rules):
     policy = make_policy(lambda s, a, b: (a, b))
     while True:
         E = evaluate(policy)
         better = make_policy(
-            lambda s, a, b: min((a, b), (b, a), key=lambda d: (E[move(s, *d)], d != policy[s, a, b]))
+            lambda s, a, b: min(
+                choices(a, b, **rules), key=lambda d: (E[move(s, *d)], d != policy[s, a, b])
+            )
         )
         if better == policy:
             return policy, E
@@ -94,6 +104,19 @@ if __name__ == "__main__":
 
     turns = simulate(best)
     print(f"\nSimulated optimal (10,000 runs): mean {statistics.mean(turns):.1f}, "
+          f"median {statistics.median(turns)}")
+
+    print("\nOptimal play with direction choice (reverse = move left/down instead):")
+    for swap in (False, True):
+        for flip_x, flip_y in ((False, False), (True, False), (False, True), (True, True)):
+            policy, E = optimal(swap=swap, flip_x=flip_x, flip_y=flip_y)
+            label = ", ".join(
+                name for name, on in (("swap dice", swap), ("reverse horizontal", flip_x),
+                                      ("reverse vertical", flip_y)) if on
+            ) or "no choice"
+            print(f"  {label:50} expected turns: {E[1]:6.2f}")
+    turns = simulate(policy)
+    print(f"Simulated full choice (10,000 runs): mean {statistics.mean(turns):.2f}, "
           f"median {statistics.median(turns)}")
 
     print("\nExpected turns remaining under optimal play (board as drawn, 100 top-left):")

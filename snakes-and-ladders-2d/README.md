@@ -19,6 +19,8 @@ square.
 - `distribution.py`: runs 10,000 games (each aborted after 1,000 turns) and prints
   the distribution of turns taken.
 - `optimal_strategy.py`: the "choose your dice" variant (see below). Requires numpy.
+- `two_player.py`: two-player win probabilities under optimal play. Requires numpy;
+  takes about 4 minutes.
 
 ## Results
 
@@ -111,3 +113,24 @@ can hit 100 in one throw from any square not in its row or column, given the rig
 
 Check: 10,000 simulated games with every choice allowed gave a mean of 10.80 turns
 (median 8) against a predicted 10.82.
+
+## Two players
+
+Two players race, both starting on square 1, player 1 moving first. Optimal play
+maximises your chance of winning, which could depend on your opponent's position, so
+`two_player.py` solves the two-player game exactly by value iteration.
+
+| Rules | Player 1 wins (exact) | Simulated, 100,000 games |
+|---|---|---|
+| Swap dice | 50.70% | 50.39% |
+| Swap dice + reverse either axis | 52.70% | 52.49% |
+
+Player 1's only edge is moving first. If each turn wins with roughly constant probability
+p, moving first wins with probability 1/(2-p); with p = 1/38 for the swap rule that's
+50.67%, close to the exact answer. The full-choice game is shorter, so the edge is bigger.
+
+If both players instead use the single-player strategy (fewest expected turns), player
+1's win chance is the same to 4 decimal places. Watching your opponent gains essentially
+nothing, because the game is almost entirely luck.
+
+The simulated results are within about 2 standard errors of the exact values.

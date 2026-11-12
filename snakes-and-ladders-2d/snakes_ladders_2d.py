@@ -30,14 +30,19 @@ def to_square(x, y):
     return y * SIZE + i + 1
 
 
-def play(rng=random, verbose=True, max_turns=None):
-    """Return the number of turns taken, or None if aborted after max_turns."""
+def play(rng=random, verbose=True, max_turns=None, choose=None):
+    """Return the number of turns taken, or None if aborted after max_turns.
+
+    choose(square, a, b) -> (dx, dy) picks which die is horizontal; default is (a, b).
+    """
     square, turns = 1, 0
     while square != END:
         if turns == max_turns:
             return None
         turns += 1
         dx, dy = rng.randint(1, 6), rng.randint(1, 6)
+        if choose:
+            dx, dy = choose(square, dx, dy)
         x, y = to_xy(square)
         landed = to_square((x + dx) % SIZE, (y + dy) % SIZE)
         square = JUMPS.get(landed, landed)

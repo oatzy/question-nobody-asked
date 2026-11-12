@@ -18,6 +18,7 @@ square.
 - `snakes_ladders_2d.py`: simulates a single game, printing each turn.
 - `distribution.py`: runs 10,000 games (each aborted after 1,000 turns) and prints
   the distribution of turns taken.
+- `optimal_strategy.py`: the "choose your dice" variant (see below). Requires numpy.
 
 ## Results
 
@@ -50,3 +51,42 @@ From one run of `distribution.py` (unseeded, so the numbers vary slightly betwee
 
 The distribution decays roughly geometrically, which suggests each turn has a similar
 chance of hitting square 100 wherever you are. In this variant, winning is mostly luck.
+
+## Variant: choose which die is horizontal
+
+After throwing, you choose which die is the horizontal move and which is the vertical.
+
+`optimal_strategy.py` computes the exact expected number of turns for a strategy by
+solving the game's Markov chain, and finds the optimal strategy by policy iteration.
+This is optimal for this particular snake and ladder layout only.
+
+| Strategy | Expected turns |
+|---|---|
+| No choice (first die always horizontal) | 100.8 |
+| Take whichever move lands on the higher square | 52.2 |
+| Launch zone rule (below) | 40.7 |
+| Optimal | 37.7 |
+
+### The launch zone rule
+
+1. If either way round lands you on 100, take it.
+2. Otherwise, if either way round lands you in the launch zone, take it.
+3. Otherwise, it doesn't matter much.
+
+The launch zone is the 6×6 block of squares from which 100 can be reached in one throw
+(29 squares once snakes and ladders are excluded). Since each die moves at most 6,
+nowhere else can reach the end directly.
+
+### Why choosing helps
+
+With no choice, the game is mostly waiting for one exact roll. With a choice, any roll
+where the dice differ gives two chances to hit 100, and you can use the choice to stay
+in the launch zone between throws. Under optimal play, the expected turns remaining is
+about 36 to 38 from almost every square, so where you are matters little as long as you
+can get back into the zone.
+
+### Checks
+
+- The exact expected turns with no choice (100.8) matches the simulated mean above (100.6).
+- 10,000 simulated games with the optimal strategy gave a mean of 37.4 (median 26)
+  against a predicted 37.7.
